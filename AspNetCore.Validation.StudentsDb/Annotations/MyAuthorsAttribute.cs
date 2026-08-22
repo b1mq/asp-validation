@@ -3,6 +3,7 @@
 namespace Validation.Annotations
 {
     // якщо не вистачає стандартних атрибутів, можна зробити власний кастомний атрибут
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class MyAuthorsAttribute : ValidationAttribute
     {
         // масив для збереження авторів
