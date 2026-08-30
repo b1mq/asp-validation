@@ -10,10 +10,12 @@ namespace Validation.Controllers
     public class StudentsController : Controller
     {
         private readonly IStudentService _studentService;
+        private readonly IValidationService _validationService;
 
-        public StudentsController(IStudentService studentService)
+        public StudentsController(IStudentService studentService, IValidationService validationService)
         {
             _studentService = studentService;
+            _validationService = validationService;
         }
 
         [AcceptVerbs("Get", "Post")]
@@ -52,18 +54,13 @@ namespace Validation.Controllers
         [ValidateAntiForgeryToken] // перевіряє токен захисту від CSRF-атак, обов'язково
         public async Task<IActionResult> Create([Bind("Id,Name,Surname,Age,GPA,Email")] Student student) // приймає об’єкт студента з прив’язкою лише вказаних полів
         {
-            if (student.Surname == "admin") // перевіряє, чи прізвище дорівнює "admin"
-                ModelState.AddModelError("Surname", "admin - заборонене прізвище"); // додає помилку до конкретного поля Surname
-            if (student.Name == student.Email) // перевіряє, чи ім'я збігається з email
-                ModelState.AddModelError("", "ім’я та електронна адреса не повинні збігатися"); // додає загальну помилку моделі (не до конкретного поля)
-                                                                                                // порожній рядок у першому параметрі означає, що помилка стосується всієї моделі, а не окремого поля
-            if (ModelState.IsValid) // перевіряє, чи пройшла модель усі валідації та наші кастомні перевірки
+            _validationService.ValidateStudent(student);
+            if (ModelState.isValid)
             {
-                _context.Add(student); // додає нового студента до контексту бази даних
-                await _context.SaveChangesAsync(); // асинхронно зберігає зміни в базу даних
-                return RedirectToAction("Index"); // перенаправляє користувача на список студентів
+                await _studentService.AddStudent(student);
+                return RedirectToAction("Index");
             }
-            return View(student); // якщо є помилки — повертає ту саму форму з введеними даними та повідомленнями про помилки
+            return View(student); 
         }
 
         // GET: Students/Edit/5
