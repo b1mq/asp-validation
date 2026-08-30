@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AspNetCore.Validation.StudentsDb.Interfaces;
+using AspNetCore.Validation.StudentsDb.Repo;
+using AspNetCore.Validation.StudentsDb.Services;
+using Microsoft.EntityFrameworkCore;
 using Validation.DbContexts;
 using Validation.Models;
 // dotnet add package Microsoft.EntityFrameworkCore !!! встановлюємо пакети, інакше код не працюватиме, View > Terminal (або NuGet)
@@ -18,6 +21,9 @@ namespace Validation
             // реєструємо контекст бази даних для роботи з SQL Server (новий контекст)
             builder.Services.AddDbContext<MyDbContext>(options =>
                 options.UseSqlServer(connection));
+            builder.Services.AddScoped<IStudentRepo, StudentRepo>();
+            builder.Services.AddScoped<IBookRepo, BookRepo>();
+            builder.Services.AddScoped<IStudentService, StudentService>();
             builder.Services.AddControllersWithViews();
             var app = builder.Build();
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCore.Validation.StudentsDb.Interfaces;
+using AspNetCore.Validation.StudentsDb.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Validation.DbContexts;
 using Validation.Models;
@@ -7,25 +9,25 @@ namespace Validation.Controllers
 {
     public class StudentsController : Controller
     {
-        private readonly MyDbContext _context;
+        private readonly IStudentService _studentService;
 
-        public StudentsController(MyDbContext context)
+        public StudentsController(IStudentService studentService)
         {
-            _context = context;    
+            _studentService = studentService;
         }
 
-        [AcceptVerbs("Get", "Post")] // дозволяє одному методу контролера обробляти запити і GET, і POST одночасно
+        [AcceptVerbs("Get", "Post")]
         public IActionResult CheckEmail(string email)
         {
-            if (email == "admin@ukr.net" || email == "admin@gmail.com")
-                return Json(false); // remote-перевірка на стороні сервера має повертати джейсон
-            return Json(true);
+            bool isAllowed = _studentService.IsEmailAllowed(email);
+            return Json(isAllowed);
         }
 
         // GET: Students
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Students.ToListAsync());
+            var students = await _studentService.GetAllStudents();
+            return View(students);
         }
 
         // GET: Students/Details/5
@@ -33,8 +35,7 @@ namespace Validation.Controllers
         {
             if (id == null) return NotFound();
 
-            var student = await _context.Students
-                .SingleOrDefaultAsync(m => m.Id == id);
+            var student = await _studentService.GetStudentById(id.Value);
             if (student == null) return NotFound();
 
             return View(student);
@@ -70,9 +71,9 @@ namespace Validation.Controllers
         {
             if (id == null) return NotFound();
 
-            var student = await _context.Students.SingleOrDefaultAsync(m => m.Id == id);
+            var student = await _studentService.GetStudentById(id.Value);
             if (student == null) return NotFound();
-            
+
             return View(student);
         }
 
