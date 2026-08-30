@@ -4,7 +4,7 @@ using Validation.Models;
 
 namespace AspNetCore.Validation.StudentsDb.Services
 {
-    public class StudentService:StudentRepo
+    public class StudentService:IStudentService
     {
         private readonly IStudentRepo _studentRepo;
         public StudentService(IStudentRepo studentRepo)

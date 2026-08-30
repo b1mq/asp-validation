@@ -1,6 +1,7 @@
 ﻿using AspNetCore.Validation.StudentsDb.Interfaces;
 using AspNetCore.Validation.StudentsDb.Repo;
 using AspNetCore.Validation.StudentsDb.Services;
+using AspNetCore.Validation.StudentsDb.Services.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Validation.DbContexts;
 using Validation.Models;
@@ -23,6 +24,7 @@ namespace Validation
                 options.UseSqlServer(connection));
             builder.Services.AddScoped<IStudentRepo, StudentRepo>();
             builder.Services.AddScoped<IBookRepo, BookRepo>();
+            builder.Services.AddMyValidation();
             builder.Services.AddScoped<IStudentService, StudentService>();
             builder.Services.AddControllersWithViews();
             var app = builder.Build();
